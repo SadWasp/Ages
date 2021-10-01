@@ -192,7 +192,11 @@ def deleteUser(request, pk):
 @api_view(['POST'])
 def authLogin(request):
     data = request.data
-    user = users_collection.find_one({"userName": data['userName']})
+
+    if db['Users'].count_documents({ 'userName': data['userName'] }, limit = 1) != 0:
+        user = users_collection.find_one({"userName": data['userName']})
+    else:
+        return Response(False)
     #authPwd = base64.b64decode(data['password'] + b'==')
     #userPwd = base64.b64decode(user['password'] + b'==')
 
@@ -226,7 +230,8 @@ def authReg(request):
     #last = users_collection.find().sort("id", pymongo.ASCENDING)
    # newId = last
     #encPass = data['password'].encode("utf-8")
-
+    if db['Users'].count_documents({ 'userName': data['userName'] }, limit = 1) != 0:
+        return Response(False) 
 
     user = User.objects.create(
         userName = data['userName'],
